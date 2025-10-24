@@ -17,22 +17,24 @@ use Modules\Teams\TeamController;
 use Modules\TeamUsers\TeamUserController;
 use Modules\Users\UserController;
 
-function registerResourceRoutes(string $prefix, string $controller, ?Closure $customRoutes = null)
-{
-    Route::prefix($prefix)->group(function () use ($controller, $customRoutes) {
-        Route::middleware('auth:api')->group(function () use ($controller) {
-            Route::get('/', [$controller, 'findAll']);
-            Route::post('/find-by-id', [$controller, 'findOneById']);
-            Route::post('/', [$controller, 'create']);
-            Route::patch('/', [$controller, 'partialUpdate']);
-            Route::delete('/', [$controller, 'softDelete']);
-            Route::post('/restore', [$controller, 'restoreDeleted']);
-            Route::delete('/force', [$controller, 'hardDelete']);
-        });
+if (!function_exists('registerResourceRoutes')) {
+    function registerResourceRoutes(string $prefix, string $controller, ?Closure $customRoutes = null)
+    {
+        Route::prefix($prefix)->group(function () use ($controller, $customRoutes) {
+            Route::middleware('auth:api')->group(function () use ($controller) {
+                Route::get('/', [$controller, 'findAll']);
+                Route::post('/find-by-id', [$controller, 'findOneById']);
+                Route::post('/', [$controller, 'create']);
+                Route::patch('/', [$controller, 'partialUpdate']);
+                Route::delete('/', [$controller, 'softDelete']);
+                Route::post('/restore', [$controller, 'restoreDeleted']);
+                Route::delete('/force', [$controller, 'hardDelete']);
+            });
 
-        // Aquí agrega se rutas personalizadas si se pasan
-        if ($customRoutes) $customRoutes($controller);
-    });
+            // Aquí agrega se rutas personalizadas si se pasan
+            if ($customRoutes) $customRoutes($controller);
+        });
+    }
 }
 
 Route::prefix('v1')->group(function () {

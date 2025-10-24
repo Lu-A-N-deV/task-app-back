@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Auth\AuthController;
 use Modules\Genres\GenreController;
 use Modules\SystemRoles\SystemRoleController;
 use Modules\Tags\TagController;
@@ -41,13 +42,18 @@ Route::prefix('v1')->group(function () {
     // Rutas para SystemRoles
     registerResourceRoutes('system-roles', SystemRoleController::class);
 
-    // Rutas para Users
-    registerResourceRoutes('users', UserController::class, function ($controller) {
-        Route::middleware('auth:api')->group(function () use ($controller) {
-            Route::post('/login', [$controller, 'login']);
-            Route::post('/register', [$controller, 'register']);
+    // Rutas para Auth
+    Route::prefix('auth')->group(function () {
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::middleware('auth:api')->group(function () {
+            Route::post('/logout', [AuthController::class, 'logout']);
+            Route::post('/refresh', [AuthController::class, 'refresh']);
         });
     });
+
+    // Rutas para Users
+    registerResourceRoutes('users', UserController::class);
 
     // Rutas para Teams
     registerResourceRoutes('teams', TeamController::class, function ($controller) {

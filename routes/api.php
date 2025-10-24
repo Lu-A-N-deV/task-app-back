@@ -19,15 +19,17 @@ use Modules\Users\UserController;
 function registerResourceRoutes(string $prefix, string $controller, ?Closure $customRoutes = null)
 {
     Route::prefix($prefix)->group(function () use ($controller, $customRoutes) {
-        Route::get('/', [$controller, 'findAll']);
-        Route::post('/find-by-id', [$controller, 'findOneById']);
-        Route::post('/', [$controller, 'create']);
-        Route::patch('/', [$controller, 'partialUpdate']);
-        Route::delete('/', [$controller, 'softDelete']);
-        Route::post('/restore', [$controller, 'restoreDeleted']);
-        Route::delete('/force', [$controller, 'hardDelete']);
+        Route::middleware('auth:api')->group(function () use ($controller) {
+            Route::get('/', [$controller, 'findAll']);
+            Route::post('/find-by-id', [$controller, 'findOneById']);
+            Route::post('/', [$controller, 'create']);
+            Route::patch('/', [$controller, 'partialUpdate']);
+            Route::delete('/', [$controller, 'softDelete']);
+            Route::post('/restore', [$controller, 'restoreDeleted']);
+            Route::delete('/force', [$controller, 'hardDelete']);
+        });
 
-        // Aquí agregas rutas personalizadas si se pasan
+        // Aquí agrega se rutas personalizadas si se pasan
         if ($customRoutes) $customRoutes($controller);
     });
 }
@@ -41,13 +43,18 @@ Route::prefix('v1')->group(function () {
 
     // Rutas para Users
     registerResourceRoutes('users', UserController::class, function ($controller) {
-        Route::post('/login', [$controller, 'login']);
+        Route::middleware('auth:api')->group(function () use ($controller) {
+            Route::post('/login', [$controller, 'login']);
+            Route::post('/register', [$controller, 'register']);
+        });
     });
 
     // Rutas para Teams
     registerResourceRoutes('teams', TeamController::class, function ($controller) {
-        Route::post('/by-user', [$controller, 'getTeamsByUser']);
-        Route::post('/with-roles/and-admin', [$controller, 'createTeamWithBasicTeamRolesAndTeamAdmin']);
+        Route::middleware('auth:api')->group(function () use ($controller) {
+            Route::post('/by-user', [$controller, 'getTeamsByUser']);
+            Route::post('/with-roles/and-admin', [$controller, 'createTeamWithBasicTeamRolesAndTeamAdmin']);
+        });
     });
 
     // Rutas para TeamRoles
@@ -67,7 +74,9 @@ Route::prefix('v1')->group(function () {
 
     // Rutas para Tasks
     registerResourceRoutes('tasks', TaskController::class, function ($controller) {
-        Route::post('/by-team', [$controller, 'getTasksByTeam']);
+        Route::middleware('auth:api')->group(function () use ($controller) {
+            Route::post('/by-team', [$controller, 'getTasksByTeam']);
+        });
     });
 
     // Rutas para TaskCommentController
@@ -78,7 +87,9 @@ Route::prefix('v1')->group(function () {
 
     // Rutas para TagController
     registerResourceRoutes('tags', TagController::class, function ($controller) {
-        Route::post('/by-team', [$controller, 'getTagsByTeam']);
+        Route::middleware('auth:api')->group(function () use ($controller) {
+            Route::post('/by-team', [$controller, 'getTagsByTeam']);
+        });
     });
 
     // Rutas para TaskTagController

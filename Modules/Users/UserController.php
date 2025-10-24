@@ -6,6 +6,7 @@ use App\Http\Controllers\GenericController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UserController extends GenericController
 {
@@ -60,6 +61,8 @@ class UserController extends GenericController
                 return $this->notFoundResponse('Credenciales incorrectas');
             }
 
+            $token = JWTAuth::fromUser($user);
+
             // Enviar la respuesta
             return response()->json([
                 'id' => $user->id,
@@ -70,9 +73,40 @@ class UserController extends GenericController
                 'email' => $user->email,
                 'genre_id' => $user->genre_id,
                 'system_role_key' => $user->systemRole->key ?? 'user',
+                'token' => $token,
             ], 200);
         } catch (\Exception $e) {
             return $this->serverErrorResponse('Error al intentar iniciar sesión', $e);
+        }
+    }
+
+    public function register(Request $request)
+    {
+        $validator = Validator::make($request->all(), $this->createRules);
+
+        if ($validator->fails()) return $this->validationErrorsResponse($validator);
+
+        try {
+            $input = $request->only($this->getFillable());
+
+            $user = $this->model()::create($input);
+
+            $token = JWTAuth::fromUser($user);
+
+            // Enviar la respuesta
+            return response()->json([
+                'id' => $user->id,
+                'username' => $user->username,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'second_last_name' => $user->second_last_name,
+                'email' => $user->email,
+                'genre_id' => $user->genre_id,
+                'system_role_key' => $user->systemRole->key ?? 'user',
+                'token' => $token,
+            ], 200);
+        } catch (\Exception $e) {
+            return $this->serverErrorResponse('Crear usuario', $e);
         }
     }
 }

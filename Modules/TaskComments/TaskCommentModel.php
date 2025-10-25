@@ -18,7 +18,7 @@ class TaskCommentModel extends Model
         'comment',
     ];
 
-    protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
+    // protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
 
     protected static function newFactory()
     {

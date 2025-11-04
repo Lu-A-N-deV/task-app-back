@@ -91,7 +91,12 @@ Route::prefix('v1')->group(function () {
     registerResourceRoutes('task-comments', TaskCommentController::class);
 
     // Rutas para TaskAttachmentController
-    registerResourceRoutes('task-attachments', TaskAttachmentController::class);
+    registerResourceRoutes('task-attachments', TaskAttachmentController::class, function ($controller) {
+        Route::middleware('auth:api')->group(function () use ($controller) {
+            Route::post('/upload', [$controller, 'uploadFile']);
+            Route::post('/view', [$controller, 'viewFile']);
+        });
+    });
 
     // Rutas para TagController
     registerResourceRoutes('tags', TagController::class, function ($controller) {

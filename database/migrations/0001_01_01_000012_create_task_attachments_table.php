@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->unsignedBigInteger('task_id');
             $table->uuid('uploaded_by');
-            $table->text('filepath');
+            $table->text('file');
             $table->timestampsTz();
             $table->softDeletesTz();
 

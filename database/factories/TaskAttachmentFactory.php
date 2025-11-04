@@ -16,7 +16,7 @@ class TaskAttachmentFactory extends Factory
         return [
             'task_id' => TaskModel::inRandomOrder()->first()?->id ?? TaskModel::factory(),
             'uploaded_by' => UserModel::inRandomOrder()->first()?->id ?? UserModel::factory(),
-            'filepath' => 'uploads/' . $this->faker->uuid . '.bin',
+            'file' => 'uploads/' . $this->faker->uuid . '.bin',
         ];
     }
 }

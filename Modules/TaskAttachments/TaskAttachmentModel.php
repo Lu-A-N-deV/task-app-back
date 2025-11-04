@@ -15,7 +15,7 @@ class TaskAttachmentModel extends Model
     protected $fillable = [
         'task_id',
         'uploaded_by',
-        'filepath',
+        'file',
     ];
 
     // protected $hidden = ['created_at', 'updated_at', 'deleted_at'];

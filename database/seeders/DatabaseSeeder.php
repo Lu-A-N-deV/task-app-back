@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             TaskStatusSeeder::class,
             TaskSeeder::class,
             TaskCommentSeeder::class,
-            TaskAttachmentSeeder::class,
+            // TaskAttachmentSeeder::class,
             TagSeeder::class,
             TaskTagSeeder::class,
         ]);

@@ -14,7 +14,7 @@ class TaskCommentSeeder extends Seeder
         $task = TaskModel::first() ?? TaskModel::factory()->create();
         $user = UserModel::where('system_role_id', 2)->first() ?? UserModel::factory()->create();
 
-        TaskCommentModel::factory()->count(5)->create([
+        TaskCommentModel::factory()->count(1)->create([
             'task_id' => $task->id,
             'user_id' => $user->id,
         ]);

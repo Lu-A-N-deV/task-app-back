@@ -35,10 +35,17 @@ class TaskAttachmentController extends GenericController
             $file = $request->file('file');
 
             // 📁 Definimos la ruta dentro del bucket
-            $path = "tasks/{$taskId}/" . $file->getClientOriginalName();
+            // $path = "tasks/{$taskId}/" . uniqid() . '_' . $file->getClientOriginalName();
+            $filename = uniqid() . '_' . $file->getClientOriginalName();
+            $path = "tasks/{$taskId}/{$filename}";
 
             // ☁️ Subimos el archivo a Supabase
-            Storage::disk('supabase')->put($path, file_get_contents($file));
+            try {
+                // Storage::disk('supabase')->put($path, file_get_contents($file));
+                Storage::disk('supabase')->putFileAs("tasks/{$taskId}", $file, $filename);
+            } catch (\Exception $e) {
+                return $this->serverErrorResponse('Error subiendo el archivo al bucket', $e);
+            }
 
             // 🗃️ Registramos el archivo en la base de datos
             $this->model()::create([
@@ -53,18 +60,14 @@ class TaskAttachmentController extends GenericController
         }
     }
 
-    public function viewFile($id)
+    public function viewFile(Request $request)
     {
         try {
-            $attachment = $this->model()::findOrFail($id);
+            $attachment = $this->model()::findOrFail($request->id);
             $path = $attachment->file;
 
             /** @var \Illuminate\Filesystem\AwsS3V3Adapter $disk */
             $disk = Storage::disk('supabase');
-
-            if (!$disk->exists($path)) {
-                return $this->notFoundResponse('No se encontró el archivo adjunto indicado');
-            }
 
             // 📥 Obtener el contenido del archivo desde Supabase
             $fileContent = $disk->get($path);
